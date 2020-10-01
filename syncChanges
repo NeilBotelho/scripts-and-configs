@@ -1,0 +1,85 @@
+#!/bin/sh
+home="/home/"$USER
+
+#Default Arguements
+dryRun=""
+verbose=""
+hideOuput="yes"
+
+#where to store
+dotfilesReciever=$home"/Desktop/suckless/backups/"
+
+printSeparator(){
+	echo "#############################################"
+}
+syncHome(){
+	# ~ dotfiles
+	echo "Syncing home directory"
+	homeDotFiles=".bashrc .gitconfig .profile .xinitrc"
+	for file in $homeDotFiles;
+	do 
+	    rsync -iz$verbose$dryRun $home"/"$file $dotfilesReciever"/home"
+	done
+	printSeparator
+}
+
+syncConfigs(){
+	# .config folders
+	echo "Syncing config directory"
+	configDotFolders="bash/ sxhkd/ nvim/ readline/"
+	for folder in $configDotFolders;
+	do
+	    rsync -aizP$verbose$dryRun --exclude="history" $home"/.config/"$folder $dotfilesReciever"/config/$folder"
+	done
+	echo "#############################################"
+
+}
+syncScripts(){
+	# /usr/local/bin files
+	echo "Syncing usr/local/bin"
+	usrBinfiles="refbar"
+	for file in $usrBinfiles;
+	do
+	    rsync -iz$verbose$dryRun  "/usr/local/bin/"$usrBinfiles $dotfilesReciever"/scripts/"
+	done
+	#Get scripts
+	echo "Syncing scripts"
+	rsync -aiz$verbose$dryRun $home"/.config/bin/" $dotfilesReciever"/scripts"
+	echo "#############################################"
+}
+
+
+main(){
+    syncHome
+    syncConfigs
+    syncScripts
+}
+
+
+while getopts :vVnh opt; do
+	case $opt in
+        v)hideOuput="no"
+            echo "v"
+        ;;
+        V) verbose="v"
+            hideOuput="no"
+            echo "V"
+		;;
+		n)dryRun="n"
+		;;
+		h)echo "Usage: Backup dotfiles
+-v : Show Output
+-V : Very Verbose Output
+-n : Dry run. No files are changed"
+		;;
+	esac
+done
+if  [ "$hideOuput" = "no" ]; then
+    main 
+else
+    main > /dev/null
+fi
+
+if [ -n "$dryRun" ];then 
+    echo "Dry run. No files were changed"
+fi
