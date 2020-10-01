@@ -1,5 +1,5 @@
-# Backup and Restore  
-My solution for backup and restore of my dotfiles and program files 
+# Cool scripts and configs
+A collection of the scripts I've written for daily use. PRs with cool scripts are welcome!!
 
 ## How it works
 I use rsync to regularly poll various files and folders for changes and pull the changes into this directory. The script I use to do this is ```syncChanges``` . The ```syncChanges``` script has a separate function defined to backup each folder allowing fine grained control over what to include and what not to include. Each function can also be used as a template to add more folders to be backed up.
