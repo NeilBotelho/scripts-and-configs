@@ -59,8 +59,6 @@ function cppFile(){
 function javaFile(){
 #Quickly run and compile java code
     #Compile the .java file
-
-
     error=`javac $1`
     #If executable was generated run it
     if [ $? -eq 0 ];then
@@ -107,7 +105,6 @@ goFile(){
 }
 
 # Main Build Logic
-#decompress just about any compressed file format
 if [ -z "$1" ]; then
     # display usage if no parameters given
     echo "Usage: c <path/file_name>.<c|c++|java>"
@@ -115,7 +112,7 @@ if [ -z "$1" ]; then
     exit
 else
 
-# Get commanline args
+# Get commandline args to be provided to the program
 Args=" "
 for i in $@
 do
@@ -134,14 +131,17 @@ esac
 
 if [ -f "$1" ] ; then
   case "${1%,}" in
-    *.c)		cFile $isPath"$1" "$Args" ;;
+    *.c)	cFile $isPath"$1" "$Args" ;;
     *.cpp)  cppFile $isPath"$1" "$Args" ;;
     *.java) javaFile $isPath"$1" "$Args" ;;
     *.go)   goFile $isPath"$1" "$Args" ;;
     *.py)   python $isPath"$1" "$Args";;
-    *)      if [ -x $1 ]; then
+    *)      # If type is not provided simply run the file
+			# Check if its executable
+			if [ -x $1 ]; then
               $isPath$1
             else
+			  # Make executable and run
               chmod +x $1 && $isPath$1
             fi
             return 1
