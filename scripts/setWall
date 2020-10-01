@@ -1,0 +1,72 @@
+#!/bin/sh
+# Sets wallpaper from different themed directories in $WALPAPER
+# Implements a queue system so that if changing between the wallpapers of the
+# same theme you cycle through them in order
+currFile=$(cd $WALLPAPER;cd ..;pwd)"/current"
+curr=$(head $currFile)
+
+getQueue(){
+	echo "$(ls $1| grep -F .)"
+}
+getNext(){
+	queue=$(getQueue $1)
+	last=$(echo "$queue" |tail -1)
+	if [ "$last" = "$curr" ];then
+		curr=$(echo "$queue" |head -1)
+	else
+		curr=$(echo "$queue" |grep -A 1 "$curr"|tail -1)
+		if [ "$curr" = "" ];then 
+			curr=$(echo "$queue"|head -1)
+		fi
+	fi
+
+	echo "$1/$curr"
+}
+
+setWallpaper(){
+	nitrogen --set-auto $1
+	echo "$1" |rev|cut -d/ -f1|rev > $currFile
+}
+
+printUsage(){
+    echo "set background from $WALLPAPER"
+    echo "USAGE:"
+    echo "-h print this usage information"
+    echo "-a set any"
+    echo "-s set safe background"
+    echo "-d set dark background"
+    echo "-S filepath : set particular file"
+}
+
+
+#Set background
+if [ -z "$1" ]; then
+    scriptName=$(basename "$0")
+    echo "try: $scriptName -h"
+    echo "for usage information"
+
+else
+	while getopts :asSdh  opt; do
+		next=""
+		case "$opt" in
+		   "a") next=$(getNext "$WALLPAPER")
+			   # nitrogen --random --no-recurse --set-auto "$WALLPAPER" &
+			   ;;
+		   "s") next=$(getNext "$WALLPAPER/safe")
+				# nitrogen --random --no-recurse --set-auto "$WALLPAPER/safe" &
+			   ;;
+		   "d") next=$(getNext "$WALLPAPER/dark")
+				# nitrogen --random --no-recurse --set-auto "$WALLPAPER/dark" &
+			   ;;
+		   "S")next="$2"
+			   ;;
+		   "h")printUsage
+			   ;;
+	   esac
+   done
+   if [ "$next" = "" ];then
+   		printUsage
+   	else
+   		setWallpaper $next
+   fi
+fi

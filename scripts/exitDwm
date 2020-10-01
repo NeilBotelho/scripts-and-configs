@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "  "
+case $BLOCK_BUTTON in
+	3)$TERMINAL -e "$EDITOR" "$0"
+	;;
+	1)pkill xinit
+	;; 
+esac

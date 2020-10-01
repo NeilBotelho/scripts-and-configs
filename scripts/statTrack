@@ -1,0 +1,26 @@
+#!/bin/sh
+battery="/home/neil/.local/share/monitor/battery"
+time=0
+status=$(battery |cut -c2)
+startCharge=$(battery|cut -d" " -f3|cut -d% -f1)
+while :;do
+	charging=$(battery |cut -c2)
+	if [ "$status" = "D" ];then
+		if [ "$charging" = "D" ] && [ $time -lt 10 ];then
+			time=$(expr $time + 1)
+		else
+			endCharge=$(battery|cut -d" " -f3|cut -d% -f1)
+			echo "$startCharge,$endCharge,$time"  >> $battery
+			time=0
+		fi
+	else
+		if [ "$status" = "C" ]; then
+			if [ "$charging" = "D" ]; then 
+				startCharge=$(battery|cut -d" " -f3|cut -d% -f1)
+			fi
+		fi
+	fi
+	status=$(battery |cut -c2)
+	sleep 60
+done
+	

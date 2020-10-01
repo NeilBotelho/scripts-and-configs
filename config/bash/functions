@@ -1,0 +1,134 @@
+#!/bin/sh
+#Functions
+
+#Edit shortcuts
+
+bashrc(){
+#edit bashrc and source
+    vim ~/.bashrc
+    source ~/.bashrc
+}
+
+vimrc(){
+#edit bashrc and source
+    vim ~/.config/nvim/init.vim
+}
+
+prof(){
+#edit bashrc and source
+    vim ~/.profile
+    source ~/.profile
+}
+
+al(){
+#edit alises
+	vim "$XDG_CONFIG_HOME"/bash/aliases
+	source ~/.bashrc
+}
+
+func(){
+#edit functions
+	vim "$XDG_CONFIG_HOME"/bash/functions
+	source ~/.bashrc
+}
+
+mcd() {
+#Make directory and then cd into it
+    mkdir -p $1
+    cd $1
+}
+rssh(){
+    ssh -R 52698:localhost:52698 $1
+}
+sklc(){
+    prog=$(printf "%s\n%s\n%s\n%s" "dwm" "st" "blocks" "surf"| dmenu)
+    if [ -z "$prog" ];then
+        return
+    fi
+    file=$(printf "%s\n%s" "config.h" "$prog.c" | dmenu)
+    if [ -z "$file" ];then
+        return
+    fi
+    subl ~/Desktop/suckless/desktop-setup/progFolders/"$prog"/"$file"
+}
+
+extract(){
+#decompress just about any compressed file format
+if [ -z "$1" ]; then
+    # display usage if no parameters given
+    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+    echo "       extract <path/file_name_1.ext> [path/file_name_2.ext] [path/file_name_3.ext]"
+    return 1
+ else
+    for n in "$@"
+    do
+      if [ -f "$n" ] ; then
+          case "${n%,}" in
+            *.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
+                         tar xvf "$n"       ;;
+            *.lzma)      unlzma ./"$n"      ;;
+            *.bz2)       bunzip2 ./"$n"     ;;
+            *.gz)        gunzip ./"$n"      ;;
+            ## unrar command not available in debian
+            #*.rar)       unrar x -ad ./"$n" ;;
+            *.rar)       unrar-free -x ./"$n" ;;
+            *.zip)       unzip ./"$n"       ;;
+            *.z)         uncompress ./"$n"  ;;
+            *.7z|*.arj|*.cab|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.rpm|*.udf|*.wim|*.xar)
+                         7z x ./"$n"        ;;
+            *.xz)        unxz ./"$n"        ;;
+            *.exe)       cabextract ./"$n"  ;;
+            *)
+                         echo "extract: '$n' - unknown archive method"
+                         return 1
+                         ;;
+          esac
+      else
+          echo "'$n' - file does not exist"
+          return 1
+      fi
+    done
+fi
+}
+
+
+
+
+function e(){
+file=$1
+file=${file::-2}
+echo $file
+garbage=`make $file`
+if [ 0 -eq $? ]
+    echo "########CODE" >"out$file.txt"
+    cat $file.c >>"out$file.txt"
+    echo "">>"out$file.txt"
+    echo "########OUTPUT">>"out$file.txt"
+then
+    ./$file >> "out$file.txt"
+    rm $file
+else
+    echo "Failed $file.cpp"
+fi
+
+}
+
+
+
+function cond(){
+# >>> conda initialize >>>
+    # !! Contents within this block are managed by 'conda init' !!
+    __conda_setup="$('/home/neil/.config/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+    if [ $? -eq 0 ]; then
+        eval "$__conda_setup"
+    else
+        if [ -f "/home/neil/.config/anaconda3/etc/profile.d/conda.sh" ]; then
+            . "/home/neil/.config/anaconda3/etc/profile.d/conda.sh"
+        else
+            export PATH="/home/neil/.config/anaconda3/bin:$PATH"
+        fi
+    fi
+    unset __conda_setup
+# <<< conda initialize <<<
+
+}

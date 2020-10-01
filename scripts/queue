@@ -1,0 +1,17 @@
+#!/bin/sh
+currFile=$(cd $WALLPAPER;cd ..;pwd)"/current"
+curr=$(head $currFile)
+getQueue(){
+	echo "$(ls $1| grep -F .)"
+}
+getNext(){
+	queue=$(getQueue $1)
+	last=$(echo "$queue" |tail -1)
+	if [ "$last" = "$curr" ];then
+		curr=$(echo "$queue" |head)
+	else
+		curr=$(echo "$queue" |grep -A 1 "$curr"|tail -1)
+	fi
+	echo $curr
+}
+getNext $WALLPAPER 

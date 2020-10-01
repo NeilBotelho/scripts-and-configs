@@ -1,0 +1,36 @@
+#!/bin/python
+import os, time, sys, shutil
+
+path = "/home/neil/test"
+
+homeDotFiles=["/home/neil/.python_history","/home/neil/.yarnrc","/home/neil/.wget-hsts","/home/neil/.viminfo","/home/neil/.npm","/home/neil/.ipython"]
+
+def deleteFolder(top):
+    if("/home/neil/test" not in top):
+        return
+    for root, dirs, files in os.walk(top, topdown=False):
+        for name in files:
+            print(os.path.join(root,name))
+            os.remove(os.path.join(root, name))
+        for name in dirs:
+            print(os.path.join(root,name))
+            os.rmdir(os.path.join(root, name))
+
+print("Clearing home of garbage")
+for f in homeDotFiles:
+    if os.path.isfile(f):
+        os.remove(f)
+    if os.path.isdir(f):
+        shutil.rmtree(f)
+print("Clearing test directory of old files")
+for f in os.listdir(path):
+    f=os.path.join(path,f)
+    if os.stat(f).st_mtime < time.time() -  7 * 86400:
+        if os.path.isfile(f):
+            os.remove(f)
+        if(os.path.isdir(f)):
+            deleteFolder(f)
+            print(f)
+            os.rmdir(f)
+
+print("Done")

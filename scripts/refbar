@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Refresh the dwmbar.
+# Send SIGTRAP signal to dwmbar script, which will handle it with a trap.
+pkill -RTMIN+10 dwmblocks 
+pkill -SIGTRAP dwmbar

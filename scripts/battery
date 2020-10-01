@@ -1,0 +1,33 @@
+#!/bin/sh
+
+#Check if charging
+charging=$(acpi|cut -d":" -f2 |cut -c2)
+if [ "$charging" = "C" ] | [ "$charging" = "U" ];then
+	charging=""
+else
+	charging=""
+fi
+
+#Get Percentage
+percentage="$(cat /sys/class/power_supply/BAT0/capacity)"
+case "$percentage" in
+   100|9[0-9])	status="  "$charging;;
+   8[0-9]|7[0-9])	status=" "$charging;;
+   6[0-9]|5[0-9])	status=" "$charging;;
+   4[0-9]|3[0-9])	status=" "$charging;;
+   *)		status=" "$charging;;
+esac
+status="$status $percentage%"
+echo " $status "	
+
+# Notify low battery
+if [ -z "$charging" ];then
+	case "$percentage" in
+		[0-9]|1[0-9]|2[0-9])   notify-send --expire-time=10000 -u "critical" "Battery Percentage is $percentage%" ;;
+	esac
+fi
+
+case $BLOCK_BUTTON in
+	3)$TERMINAL -e "$EDITOR" "$0";pkill -RTMIN+3 dwmblocks
+	;; 
+esac

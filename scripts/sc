@@ -1,0 +1,37 @@
+#!/bin/sh
+imgHome="/home/neil/.cache/sc/"
+
+
+screenshot(){
+	lastFile=$(ls "$imgHome" |cut -d. -f1 |sort |tail -1)
+	newFile=$(expr $lastFile + 1)
+	newFile=$imgHome$newFile.jpg
+	err=$(maim $newFile -s 2>&1)
+	if [ $? -eq 0 ];then
+		notify-send -t 2000 "Saved s to $newFile"
+	else
+		notify-send -t 2000 "$err"
+	fi
+}
+
+delLast(){
+	lastFile=$(ls "$imgHome" |tail -1)
+	echo "Deleting $lastFile"
+	echo "Press any key to confirm"
+	read garbage
+	rm $lastFile
+
+}
+
+normal="1"
+while getopts :d opt; do
+	case $opt in
+		d)
+			normal="0"
+			delLast
+			;;
+	esac
+done
+if [ "$normal" = "1" ];then
+	screenshot
+fi

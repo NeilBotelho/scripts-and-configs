@@ -1,0 +1,81 @@
+#!/bin/sh
+
+#Default aliases
+ alias cp="cp -i"                          # confirm before overwriting something
+ alias df='df -h'                          # human-readable sizes
+ alias free='free -m'                      # show sizes in MB
+ alias np='nano -w PKGBUILD'
+ alias more='less'
+
+ #Print aliases
+alias aliases="grep --color=always -e '^$' -e "alias" '$XDG_CONFIG_HOME'/bash/aliases|less -R"
+alias functions="grep --color=always -A 1 '^function ' '$XDG_CONFIG_HOME'/bash/functions|less -R"
+
+#Navigation aliases
+alias psl="cd /home/neil/projects/psl/federated-learning-lib/ && condai && conda activate psl"
+alias cd..="cd .."
+alias ..="cd .."
+alias walls="cd /home/neil/suckless/larbs/wallpaper/Anime/all/myWall"
+alias compw="cd ~/Desktop/Code/other/compewter"
+alias skl="cd ~/Desktop/suckless/desktop-setup"
+alias wd="cd ~/Desktop/Code/"
+alias skewl="cd ~/Desktop/skewl/sem5"
+alias scripts="cd ~/.local/bin"
+alias e="cd ~/Deskop/mot"
+alias swol="cd ~/Desktop/Workouts/"
+alias bins="cd ~/.config/bin/"
+alias t="cd ~/test"
+alias pr="cd ~/projects"
+
+#Edit aliases
+alias binds="vim ~/.config/sxhkd/sxhkdrc"
+alias stc="vim ~/suckless/st/config.h"
+alias xrc="vim ~/.xinitrc"
+
+#Custom Aliases
+alias vim="nvim"
+alias jup="jupyter-notebook" #Start jupyter notebooks
+alias pip="pip3"
+alias python="python3"
+alias p="python3"
+alias clip="xclip -sel clip"
+alias restart="sudo restart"
+alias vault="sudo vault"
+alias back="sudo back"
+alias tmux="tmux -2"
+alias edit="fzf|subl"
+alias qdit="fzf|vim"
+alias grep="grep --color"
+alias build="sudo make clean install"
+alias xfce="startx /usr/bin/xfce4-session"
+alias sl="ls"
+alias urxvt='urxvt -bg "#1b1c1b" -fg "#ffffff" -fn "xft:Bitst'
+alias yt="rm -rf"
+alias rmf="yt"
+alias spi="ssh -R 52698:localhost:52698 neil@192.168.0.120"
+alias hpi="ssh -R 52698:localhost:52698 hadoop@192.168.0.120"
+alias sulb="subl"
+alias startHadoop="$HADOOP_HOME/sbin/start-dfs.sh && $HADOOP_HOME/sbin/start-yarn.sh"
+alias jup="jupyter notebook"
+alias cpr="cp -r"
+
+#Package manager aliases
+alias install="sudo pacman -S"
+alias remove="sudo pacman -Rns"
+alias update="sudo pacman -Syu"
+alias updateMirrors="sudo pacman-mirrors --fasttrack && sudo pacman -Syyu"
+
+#New
+alias ll="ls -lha" #List everything in human readable form
+alias ls="ls -hN --color=auto --group-directories-first" #Make ls human readable with color and directories first
+alias l="ls"
+alias size="du -ach | sort -h" #Gives size of eveything includeing folders
+alias DF="df -Tha --total"  #Current Disk usage
+alias psg="ps aux | grep -v grep | grep -i -e VSZ -e" #Grep the process table
+alias mkdir="mkdir -pv" #Make the necessary parent directories
+alias gh="history | grep -m 30" #Grep history
+
+
+
+#For clearing home
+alias wget='wget --hsts-file="$XDG_CACHE_HOME/wget-hsts"'
