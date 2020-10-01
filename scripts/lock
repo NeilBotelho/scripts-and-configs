@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+# script to make brightness 0 before locking
+# and then restores it after unlocking 
+brt=$(xbacklight -get)
+
+: ${1?"Pass a lock command. Thank you!"}
+
+xbacklight -set 0
+$1
+xbacklight -set $brt
