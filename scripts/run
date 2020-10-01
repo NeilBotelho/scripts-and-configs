@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+# This a simple script to run programs, I add new languages as I start
+# using a language often. or, if a langauge is being taught during 
+# college. The main purpose of this script is to make compiling and 
+# running a program easy. The secondary purpose is to quickly create a 
+# text file with source code and output for college work. Adding 
+# arguments to commands is not supported yet. Might add if I feel like 
+# it. Feel free to add support to more languages.
+from os import system, get_terminal_size,remove
+import argparse
+
+#languages that have a output file
+#output files get deleted after running.
+compiled=["c","cpp"]
+
+#function for parsing the arguments, see run -h.
+def argsparser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filenames",help="Name(s) of the file/Multiple files",nargs="+")
+    parser.add_argument("-e","--ext",help="to specify the extension, if not already in file name")
+    parser.add_argument("-c","--compiler",help="to specify the compiler command")
+    parser.add_argument("-v","--verbosity",help="increases verbosity",action="count",default=0)
+    return parser.parse_args()
+
+# function to create a command based on file extension or specified
+# language currently supports c, cpp, python and java
+def command_creator(args):
+    #list of the files to run, with name, ext, command and output.
+    files=[]
+    for file in args.filenames:
+        if args.ext:
+            ext=args.ext
+        else:
+            ext=file.split(".")[-1]
+            name_no_ext=file.split(".")[0]
+        if args.compiler:
+            command=args.compiler+" "
+        elif ext=="c":
+            command=f"gcc -lm {file} && ./a.out"
+            output = "a.out"
+        elif ext=="cpp":
+            command=f"g++ {file} && ./a.out"
+            output = "a.out"
+        elif ext=="py":
+            command=f"python {file}"
+            output = None
+        elif ext=="java":
+            arg=input("Do you want to pass any args to {file}? (y/n)").lower()
+            print("\033[A                                              \033[A") 
+            if arg=="y":
+                arg=input("Enter the arguments: ")
+                print("\033[A                                            \033[A") 
+            else:
+                arg=""
+            command=f"javac {file} && java {name_no_ext} {arg}"
+            output =f"{name_no_ext}.class"
+        else:
+            print("filetype not supported")
+        files.append({"ext":ext,"command":command,"name":file,"output":output})
+    return files
+
+# this function runs the command created by command_creator()
+# and deletes .out files
+def run(args,files):
+    for file in files:
+        if args.verbosity>1: #verbosity
+            print("-"*get_terminal_size()[0])
+            print(f"\nSource code for {file['name']}:\n")
+            system(f"cat {file['name']}")
+            print()
+        command=file["command"]
+        if args.verbosity>0 or len(files)>1: #verbosity
+            print("running "+command+"\n")
+        system(file["command"])
+        #for compiled files, output is deleted here.
+        output=file["output"]
+        if output:
+            if args.verbosity>2:
+                print("\nremoving "+output+"\n")
+            remove(output)
+        print()
+
+def main():
+    args=argsparser()
+    files=command_creator(args)
+    if args.verbosity>2:
+        print(args)
+    run(args,files)
+
+if __name__=="__main__":
+    main()
