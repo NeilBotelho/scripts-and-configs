@@ -1,7 +1,16 @@
-#!/bin/bash
+#!/bin/sh
+
+#Save default Field separator
+SAVEIFS=$IFS
+restoreIFS(){
+    IFS=$SAVEIFS
+}
+
+#Trap in case of exit
+trap restoreIFS INT
 
 #Build Shortcuts
-function cFile(){
+cFile(){
 #Quickly compile and run C code
    cFile=$(echo "$1"|rev |cut -d"/" -f1|rev|cut -d. -f1)
    error=$(make "$cFile")
@@ -14,7 +23,7 @@ function cFile(){
 	    do
 	        if [ $i != $1 ]
 	        then
-	            args="$args ${i}"
+	            args="$args $i"
 
 	        fi
 	    done
@@ -28,7 +37,7 @@ function cFile(){
    fi
 }
 
-function cppFile(){
+cppFile(){
 #Quickly compile and run C++ code
    cFile=$(echo "$1"|rev |cut -d"/" -f1|rev|cut -d. -f1)
    # cFile=$(echo "$cFile"|cut -d. -f1)
@@ -42,7 +51,7 @@ function cppFile(){
 	    do
 	        if [ $i != $1 ]
 	        then
-	            args="$args ${i}"
+	            args="$args $i"
 
 	        fi
 	    done
@@ -56,20 +65,22 @@ function cppFile(){
    fi
 }
 
-function javaFile(){
+javaFile(){
 #Quickly run and compile java code
     #Compile the .java file
-    error=`javac $1`
+
+
+    error=$(javac $1)
     #If executable was generated run it
     if [ $? -eq 0 ];then
-        cFile=`echo $1|rev |cut -d"/" -f1|rev|cut -d. -f1`
+        cFile=$(echo $1|rev |cut -d"/" -f1|rev|cut -d. -f1)
         args=" "
 	    #Create arguements string
 	    for i in $@
 	    do
 	        if [ $i != $1 ]
 	        then
-	            args="$args ${i}"
+	            args="$args $i"
 
 	        fi
 	    done
@@ -97,7 +108,7 @@ goFile(){
   do
     if [ $i != $1 ]
     then
-        args="$args ${i}"
+        args="$args $i"
 
     fi 
   done
@@ -105,51 +116,54 @@ goFile(){
 }
 
 # Main Build Logic
+#decompress just about any compressed file format
 if [ -z "$1" ]; then
     # display usage if no parameters given
     echo "Usage: c <path/file_name>.<c|c++|java>"
     echo "       c <path/file_name_1.c>"
     exit
 else
+	# set  Field separator
+	IFS=$(printf "\n\b")
 
-# Get commandline args to be provided to the program
-Args=" "
-for i in $@
-do
-  if [ $i != $1 ];then
-    Args="${Args} ${i}"
-  fi
-done
+	# Get commanline args
+	Args=" "
+	for i in $@;do
+	  if [ "$i" != "$1" ];then
+	    echo "$i"
+	    Args="$Args $i"
+	  fi
+	done
 
-#Check if path is provided
-case "$1" in
-    /*) isPath=""
-        ;;
+	#Check if path is provided
+	case "$1" in
+	    /*) isPath=""
+	        ;;
 
-    *)isPath="./"
-esac
+	    *)isPath="./"
+	esac
 
-if [ -f "$1" ] ; then
-  case "${1%,}" in
-    *.c)	cFile $isPath"$1" "$Args" ;;
-    *.cpp)  cppFile $isPath"$1" "$Args" ;;
-    *.java) javaFile $isPath"$1" "$Args" ;;
-    *.go)   goFile $isPath"$1" "$Args" ;;
-    *.py)   python $isPath"$1" "$Args";;
-    *)      # If type is not provided simply run the file
-			# Check if its executable
-			if [ -x $1 ]; then
-              $isPath$1
-            else
-			  # Make executable and run
-              chmod +x $1 && $isPath$1
-            fi
-            return 1
-            ;;
-  esac
-else
-      echo "'$1' - file does not exist"
-      return 1
+	if [ -f "$1" ] ; then
+	  case "${1%,}" in
+	    *.c)	cFile $isPath"$1" "$Args" ;;
+	    *.cpp)  cppFile $isPath"$1" "$Args" ;;
+	    *.java) javaFile $isPath"$1" "$Args" ;;
+	    *.go)   goFile $isPath"$1" "$Args" ;;
+	    *.py)   python $isPath"$1" "$Args";;
+	    *)      if [ -x $1 ]; then
+	              $isPath$1
+	            else
+	              chmod +x $1 && $isPath$1
+	            fi
+	            # restore $IFS
+				IFS=$SAVEIFS
+	            exit
+	            ;;
+	  esac
+	else
+	      echo "'$1' - file does not exist"
+	fi
 fi
-fi
 
+# restore $IFS
+IFS=$SAVEIFS
