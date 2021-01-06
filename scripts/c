@@ -116,7 +116,7 @@ goFile(){
 }
 
 # Main Build Logic
-#decompress just about any compressed file format
+#Print Usage
 if [ -z "$1" ]; then
     # display usage if no parameters given
     echo "Usage: c <path/file_name>.<c|c++|java>"
